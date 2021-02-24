@@ -21,8 +21,8 @@ export class AuthService {
 
   constructor(
     @InjectModel(User.name)
-    private userModel: Model<UserDocument>,
-    private jwtService: JwtService,
+    private readonly userModel: Model<UserDocument>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async signUp(createUserDto: CreateUserDto): Promise<User> {
@@ -43,7 +43,7 @@ export class AuthService {
   async signIn(authCredenticalsDto: AuthCredentialsDto): Promise<{ accessToken: string }> {
     try {
       const user = await this.findByCredentials(authCredenticalsDto);
-      const payload: JwtPayload = { _id: user._id, userType: user.userType, name: user.name };
+      const payload: JwtPayload = { _id: user._id, role: user.role, name: user.name };
       const accessToken = this.jwtService.sign(payload);
 
       this.logger.debug(`Generated JWT Token with payload ${JSON.stringify(payload)}`);
@@ -51,7 +51,8 @@ export class AuthService {
       return { accessToken };
     } catch (error) {
       console.error(error);
-      throw new InternalServerErrorException();
+      if (error.response) return error.response;
+      else throw new InternalServerErrorException();
     }
   }
 
@@ -60,11 +61,17 @@ export class AuthService {
 
     const user = await this.userModel.findOne({ email });
     if (!user) {
-      throw new Error('Email không tồn tại trong hệ thống');
+      throw new HttpException(
+        { status: HttpStatus.NOT_ACCEPTABLE, error: 'Email does not exits' },
+        HttpStatus.NOT_ACCEPTABLE,
+      );
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new Error('Mật khẩu không chính xác');
+      throw new HttpException(
+        { status: HttpStatus.NOT_ACCEPTABLE, error: 'Wrong Password' },
+        HttpStatus.NOT_ACCEPTABLE,
+      );
     }
 
     return user;

@@ -29,7 +29,7 @@ export class User {
   profileImage: string;
 
   @Prop({ required: true, type: String, default: 'customer' })
-  userType: string;
+  role: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

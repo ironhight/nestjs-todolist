@@ -1,8 +1,7 @@
-import { Body, Controller, Get, Post, Res, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
-import { GetUser } from '../users/get-user.decorator';
 import { User } from '../users/schemas/user.schema';
 
 @Controller('auth')
@@ -15,6 +14,7 @@ export class AuthController {
   }
 
   @Post('sign-in')
+  @HttpCode(200)
   signIn(
     @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
   ): Promise<{ accessToken: string }> {
