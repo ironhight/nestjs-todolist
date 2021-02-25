@@ -28,14 +28,25 @@ export class AuthService {
   async signUp(createUserDto: CreateUserDto): Promise<User> {
     try {
       const user = new this.userModel(createUserDto);
-      await this.validateUser(createUserDto);
+      const { role } = createUserDto;
 
-      await user.validate();
+      if (role === 'admin') {
+        throw new HttpException(
+          { status: HttpStatus.NOT_ACCEPTABLE, error: 'Admin not create' },
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
+
+      const validateUser = await this.validateUser(createUserDto);
+
+      if (validateUser) {
+        return validateUser.response;
+      }
 
       await user.save();
       return user;
     } catch (error) {
-      console.error(error);
+      if (error.response) return error.response;
       throw new InternalServerErrorException();
     }
   }
@@ -77,29 +88,29 @@ export class AuthService {
     return user;
   }
 
-  async validateUser(authValidatorDto: AuthValidatorDto) {
+  async validateUser(createUserDto: CreateUserDto) {
     try {
-      const { email, phone } = authValidatorDto;
+      const { email, phone, role = 'customer' } = createUserDto;
 
-      const exitsUserEmail = await this.userModel.findOne({ email });
+      const exitsUserEmail = await this.userModel.findOne({ email, role });
 
-      if (exitsUserEmail.email) {
+      if (exitsUserEmail && exitsUserEmail.email) {
         throw new HttpException(
           { status: HttpStatus.BAD_REQUEST, error: 'Duplicate email' },
           HttpStatus.BAD_REQUEST,
         );
       }
 
-      const exitsUserPhone = await this.userModel.findOne({ phone });
+      const exitsUserPhone = await this.userModel.findOne({ phone, role });
 
-      if (exitsUserPhone.phone) {
+      if (exitsUserPhone && exitsUserPhone.phone) {
         throw new HttpException(
           { status: HttpStatus.BAD_REQUEST, error: 'Duplicate phone' },
           HttpStatus.BAD_REQUEST,
         );
       }
     } catch (error) {
-      console.error(error);
+      return error;
     }
   }
 }
