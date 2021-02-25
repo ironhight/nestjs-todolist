@@ -13,7 +13,6 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
-import { AuthValidatorDto } from './dto/auth-validator.dto';
 
 @Injectable()
 export class AuthService {
@@ -26,29 +25,20 @@ export class AuthService {
   ) {}
 
   async signUp(createUserDto: CreateUserDto): Promise<User> {
-    try {
-      const user = new this.userModel(createUserDto);
-      const { role } = createUserDto;
+    const user = new this.userModel(createUserDto);
+    const { role } = createUserDto;
 
-      if (role === 'admin') {
-        throw new HttpException(
-          { status: HttpStatus.NOT_ACCEPTABLE, error: 'Admin not create' },
-          HttpStatus.NOT_ACCEPTABLE,
-        );
-      }
-
-      const validateUser = await this.validateUser(createUserDto);
-
-      if (validateUser) {
-        return validateUser.response;
-      }
-
-      await user.save();
-      return user;
-    } catch (error) {
-      if (error.response) return error.response;
-      throw new InternalServerErrorException();
+    if (role === 'admin') {
+      throw new HttpException(
+        { status: HttpStatus.NOT_ACCEPTABLE, error: 'Admin not create' },
+        HttpStatus.NOT_ACCEPTABLE,
+      );
     }
+
+    await this.validateUser(createUserDto);
+
+    await user.save();
+    return user;
   }
 
   async signIn(authCredenticalsDto: AuthCredentialsDto): Promise<{ accessToken: string }> {
@@ -89,28 +79,24 @@ export class AuthService {
   }
 
   async validateUser(createUserDto: CreateUserDto) {
-    try {
-      const { email, phone, role = 'customer' } = createUserDto;
+    const { email, phone, role = 'customer' } = createUserDto;
 
-      const exitsUserEmail = await this.userModel.findOne({ email, role });
+    const exitsUserEmail = await this.userModel.findOne({ email, role });
 
-      if (exitsUserEmail && exitsUserEmail.email) {
-        throw new HttpException(
-          { status: HttpStatus.BAD_REQUEST, error: 'Duplicate email' },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+    if (exitsUserEmail && exitsUserEmail.email) {
+      throw new HttpException(
+        { status: HttpStatus.BAD_REQUEST, error: 'Duplicate email' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
-      const exitsUserPhone = await this.userModel.findOne({ phone, role });
+    const exitsUserPhone = await this.userModel.findOne({ phone, role });
 
-      if (exitsUserPhone && exitsUserPhone.phone) {
-        throw new HttpException(
-          { status: HttpStatus.BAD_REQUEST, error: 'Duplicate phone' },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-    } catch (error) {
-      return error;
+    if (exitsUserPhone && exitsUserPhone.phone) {
+      throw new HttpException(
+        { status: HttpStatus.BAD_REQUEST, error: 'Duplicate phone' },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }
