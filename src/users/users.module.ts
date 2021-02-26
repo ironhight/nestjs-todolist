@@ -7,6 +7,7 @@ import * as bcrypt from 'bcryptjs';
 import { AuthModule } from '../auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from '../guards/roles.guard';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { RolesGuard } from '../guards/roles.guard';
   controllers: [UsersController],
   providers: [
     UsersService,
+    ConfigService,
     {
       provide: APP_GUARD,
       useClass: RolesGuard,

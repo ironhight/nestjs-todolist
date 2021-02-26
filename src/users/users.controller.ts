@@ -8,6 +8,10 @@ import {
   Delete,
   Patch,
   Body,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+  HttpCode,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -16,6 +20,7 @@ import { UserRole } from '../auth/enums/user-role.enum';
 import { User } from '../users/schemas/user.schema';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
 @UseGuards(AuthGuard())
@@ -42,6 +47,16 @@ export class UsersController {
     @Body() updatePasswordDto: UpdatePasswordDto,
   ): Promise<{ status: number; message: string }> {
     return this.usersService.updatePasswordById(id, updatePasswordDto);
+  }
+
+  @Post('/upload-avatar/:id')
+  @UseInterceptors(FileInterceptor('file'))
+  @HttpCode(200)
+  uploadAvatarById(
+    @Param('id', ValidationPipe) id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.usersService.uploadAvatarById(id, file.buffer, file.originalname);
   }
 
   @Delete('/:id')

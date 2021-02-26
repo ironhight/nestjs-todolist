@@ -5,12 +5,15 @@ import { User, UserDocument } from './schemas/user.schema';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import * as bcrypt from 'bcryptjs';
+import { S3 } from 'aws-sdk';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name)
-    private userModel: Model<UserDocument>,
+    private readonly userModel: Model<UserDocument>,
+    private readonly configService: ConfigService,
   ) {}
 
   async getUserById(id: string): Promise<User> {
@@ -53,6 +56,36 @@ export class UsersService {
 
     await user.save();
     return user;
+  }
+
+  async uploadAvatarById(id: string, imageBuffer: Buffer, fileName: string) {
+    const user = await this.userModel.findById(id);
+
+    const s3 = new S3();
+    const uploadResult = await s3
+      .upload({
+        Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+        Body: imageBuffer,
+        Key: fileName,
+      })
+      .promise();
+
+    const avatar = {
+      key: uploadResult.Key,
+      url: uploadResult.Location,
+    };
+
+    if (!user) {
+      throw new NotFoundException(`User with ID "${id}" not found`);
+    }
+    user.profileImage = avatar.url;
+
+    await user.save();
+
+    return {
+      message: 'Upload avatar successfully',
+      avatar: user.profileImage,
+    };
   }
 
   async updatePasswordById(id: string, updatePasswordDto: UpdatePasswordDto) {
