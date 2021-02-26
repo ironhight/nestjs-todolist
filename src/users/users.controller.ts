@@ -15,6 +15,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../auth/enums/user-role.enum';
 import { User } from '../users/schemas/user.schema';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Controller('user')
 @UseGuards(AuthGuard())
@@ -33,6 +34,14 @@ export class UsersController {
     @Body() updateProfileDto: UpdateProfileDto,
   ): Promise<User> {
     return this.usersService.updateUserById(id, updateProfileDto);
+  }
+
+  @Patch('/change-password/:id')
+  updatePasswordById(
+    @Param('id', ValidationPipe) id: string,
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ): Promise<{ status: number; message: string }> {
+    return this.usersService.updatePasswordById(id, updatePasswordDto);
   }
 
   @Delete('/:id')

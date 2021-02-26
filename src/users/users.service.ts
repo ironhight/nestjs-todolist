@@ -3,6 +3,8 @@ import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestj
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -51,6 +53,33 @@ export class UsersService {
 
     await user.save();
     return user;
+  }
+
+  async updatePasswordById(id: string, updatePasswordDto: UpdatePasswordDto) {
+    const { oldPassword, newPassword } = updatePasswordDto;
+
+    const user = await this.userModel.findById(id);
+
+    if (!user) {
+      throw new NotFoundException(`User with ID "${id}" not found`);
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isMatch) {
+      throw new HttpException(
+        { status: HttpStatus.NOT_ACCEPTABLE, error: 'Old password is not match' },
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    return {
+      status: 200,
+      message: 'Change password success',
+    };
   }
 
   async deleteUserById(id: string) {
