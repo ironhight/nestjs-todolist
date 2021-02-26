@@ -1,9 +1,14 @@
-import { HttpService, Injectable } from '@nestjs/common';
+import { HttpService, Injectable, HttpException, NotFoundException } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class EmailService {
-  constructor(private readonly mailerService: MailerService, private httpService: HttpService) {}
+  constructor(
+    private readonly mailerService: MailerService,
+    private readonly userService: UsersService,
+    private httpService: HttpService,
+  ) {}
 
   public async sendMail(
     mailto: string,
@@ -12,14 +17,15 @@ export class EmailService {
     data: Record<any, any>,
     isVerify: boolean,
   ): Promise<boolean> {
-    if (isVerify) {
-      const arrayEmail = mailto.split(',');
-      for (const i in arrayEmail) {
-        if (!(await this.verifyEmail(arrayEmail[i]))) {
-          return false;
-        }
-      }
+    const { token } = data;
+    const user = await this.userService.checkUserEmail(mailto);
+    if (!user) {
+      throw new NotFoundException(`User with ID "${mailto}" not found`);
     }
+
+    user.resetPasswordToken = token;
+
+    await user.save();
 
     await this.mailerService.sendMail({
       to: mailto,

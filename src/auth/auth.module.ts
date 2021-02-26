@@ -25,6 +25,9 @@ import { JwtUserMiddleware } from '../middlewares/jwtUser.middleware';
 })
 export class AuthModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtUserMiddleware).forRoutes({ path: 'user/', method: RequestMethod.ALL });
+    consumer
+      .apply(JwtUserMiddleware)
+      .exclude({ path: 'user/reset-password', method: RequestMethod.GET })
+      .forRoutes({ path: 'user/', method: RequestMethod.ALL });
   }
 }

@@ -38,5 +38,6 @@ import { ConfigService } from '@nestjs/config';
       useClass: RolesGuard,
     },
   ],
+  exports: [UsersService],
 })
 export class UsersModule {}

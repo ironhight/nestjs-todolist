@@ -12,6 +12,7 @@ import {
   UploadedFile,
   UseInterceptors,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -21,6 +22,7 @@ import { User } from '../users/schemas/user.schema';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('user')
 @UseGuards(AuthGuard())
@@ -57,6 +59,11 @@ export class UsersController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.usersService.uploadAvatarById(id, file.buffer, file.originalname);
+  }
+
+  @Get('/reset-password')
+  resetPassword(@Query(ValidationPipe) resetPasswordDto: ResetPasswordDto) {
+    return this.usersService.resetPassword(resetPasswordDto);
   }
 
   @Delete('/:id')

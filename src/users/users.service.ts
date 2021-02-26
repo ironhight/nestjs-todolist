@@ -7,6 +7,7 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import * as bcrypt from 'bcryptjs';
 import { S3 } from 'aws-sdk';
 import { ConfigService } from '@nestjs/config';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -117,5 +118,23 @@ export class UsersService {
 
   async deleteUserById(id: string) {
     return await this.userModel.deleteOne({ _id: id });
+  }
+
+  async checkUserEmail(email: string) {
+    return await this.userModel.findOne({ email });
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const { email, token } = resetPasswordDto;
+    console.log(
+      '🚀 ~ file: users.service.ts ~ line 129 ~ UsersService ~ resetPassword ~ token',
+      token,
+    );
+    console.log(
+      '🚀 ~ file: users.service.ts ~ line 129 ~ UsersService ~ resetPassword ~ email',
+      email,
+    );
+
+    return true;
   }
 }

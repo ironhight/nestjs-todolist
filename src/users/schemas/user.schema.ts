@@ -30,6 +30,9 @@ export class User {
 
   @Prop({ required: true, type: String, default: 'customer' })
   role: string;
+
+  @Prop({ type: String })
+  resetPasswordToken: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
