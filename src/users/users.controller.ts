@@ -25,10 +25,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('user')
-@UseGuards(AuthGuard())
 export class UsersController {
   private logger = new Logger('UsersController');
   constructor(private readonly usersService: UsersService) {}
+
+  @Get('/reset-password')
+  resetPassword(@Query() resetPasswordDto: ResetPasswordDto) {
+    return this.usersService.resetPassword(resetPasswordDto);
+  }
 
   @Get('/:id')
   getUserById(@Param('id', ValidationPipe) id: string): Promise<User> {
@@ -59,11 +63,6 @@ export class UsersController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.usersService.uploadAvatarById(id, file.buffer, file.originalname);
-  }
-
-  @Get('/reset-password')
-  resetPassword(@Query(ValidationPipe) resetPasswordDto: ResetPasswordDto) {
-    return this.usersService.resetPassword(resetPasswordDto);
   }
 
   @Delete('/:id')

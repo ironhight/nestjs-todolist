@@ -6,6 +6,10 @@ import { TasksModule } from './tasks/tasks.module';
 import { EmailModule } from './email/email.module';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
+import { APP_FILTER } from '@nestjs/core';
+import { AllExceptionsFilter } from './common/exception/all-exception.filter';
+import { LogModule } from './common/log/log.module';
+
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://localhost:27017/todo-list', {
@@ -22,6 +26,13 @@ import * as Joi from 'joi';
     AuthModule,
     TasksModule,
     EmailModule,
+    LogModule,
+  ],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
   ],
 })
 export class AppModule {}

@@ -12,7 +12,7 @@ export class JwtUserMiddleware implements NestMiddleware {
       : null;
     if (!encryptedToken)
       throw new HttpException(
-        { status: HttpStatus.FORBIDDEN, error: 'Token is miss' },
+        { status: HttpStatus.FORBIDDEN, error: 'You not permission to route this link!' },
         HttpStatus.FORBIDDEN,
       );
     let payload = await this.jwtService.verify(encryptedToken);

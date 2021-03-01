@@ -6,7 +6,7 @@ import { User, UserSchema, UserDocument } from './schemas/user.schema';
 import * as bcrypt from 'bcryptjs';
 import { AuthModule } from '../auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from '../guards/roles.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
 import { ConfigService } from '@nestjs/config';
 
 @Module({

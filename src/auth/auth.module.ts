@@ -6,7 +6,8 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../users/schemas/user.schema';
-import { JwtUserMiddleware } from '../middlewares/jwtUser.middleware';
+import { JwtUserMiddleware } from '../common/middlewares/jwtUser.middleware';
+import { UsersController } from '../users/users.controller';
 
 @Module({
   imports: [
@@ -28,6 +29,6 @@ export class AuthModule {
     consumer
       .apply(JwtUserMiddleware)
       .exclude({ path: 'user/reset-password', method: RequestMethod.GET })
-      .forRoutes({ path: 'user/', method: RequestMethod.ALL });
+      .forRoutes(UsersController);
   }
 }

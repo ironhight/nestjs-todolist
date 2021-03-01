@@ -126,14 +126,15 @@ export class UsersService {
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const { email, token } = resetPasswordDto;
-    console.log(
-      '🚀 ~ file: users.service.ts ~ line 129 ~ UsersService ~ resetPassword ~ token',
-      token,
-    );
-    console.log(
-      '🚀 ~ file: users.service.ts ~ line 129 ~ UsersService ~ resetPassword ~ email',
-      email,
-    );
+
+    const user = await this.userModel.findOne({ resetPasswordToken: token, email });
+
+    if (!user) {
+      throw new HttpException(
+        { status: HttpStatus.NOT_ACCEPTABLE, error: 'Token reset password not match' },
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
 
     return true;
   }
