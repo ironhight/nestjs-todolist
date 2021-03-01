@@ -34,12 +34,19 @@ export class UsersController {
     return this.usersService.resetPassword(resetPasswordDto);
   }
 
+  @Get('/all')
+  @Roles(UserRole.Admin)
+  getAllUser(): Promise<User[]> {
+    return this.usersService.getAllUser();
+  }
+
   @Get('/:id')
   getUserById(@Param('id', ValidationPipe) id: string): Promise<User> {
     return this.usersService.getUserById(id);
   }
 
   @Patch('/:id')
+  @Roles(...[UserRole.Customer, UserRole.Admin])
   updateUserById(
     @Param('id', ValidationPipe) id: string,
     @Body() updateProfileDto: UpdateProfileDto,
@@ -48,6 +55,7 @@ export class UsersController {
   }
 
   @Patch('/change-password/:id')
+  @Roles(...[UserRole.Customer, UserRole.Admin])
   updatePasswordById(
     @Param('id', ValidationPipe) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
@@ -56,6 +64,7 @@ export class UsersController {
   }
 
   @Post('/upload-avatar/:id')
+  @Roles(...[UserRole.Customer, UserRole.Admin])
   @UseInterceptors(FileInterceptor('file'))
   @HttpCode(200)
   uploadAvatarById(

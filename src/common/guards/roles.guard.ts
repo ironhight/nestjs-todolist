@@ -28,10 +28,6 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    if (user === 'admin') {
-      return true;
-    }
-
     throw new HttpException('You do not have permission (Roles)', HttpStatus.UNAUTHORIZED);
   }
 }

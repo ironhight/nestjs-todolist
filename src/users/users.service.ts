@@ -27,6 +27,11 @@ export class UsersService {
     return found;
   }
 
+  async getAllUser(): Promise<UserDocument[]> {
+    const user = await this.userModel.find();
+    return user;
+  }
+
   async updateUserById(id: string, updateProfileDto: UpdateProfileDto): Promise<User> {
     const user = await this.userModel.findById(id);
     const { email, phone, name, birthday, profileImage } = updateProfileDto;
