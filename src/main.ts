@@ -15,7 +15,7 @@ async function bootstrap() {
     region: 'ap-southeast-1',
     signatureVersion: 'v4',
   });
-  await app.listen(3000);
+  await app.listen(3006);
   logger.log(`Application listening on port 3000`);
 }
 bootstrap();
