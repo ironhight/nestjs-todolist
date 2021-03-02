@@ -12,8 +12,8 @@ export class JwtUserMiddleware implements NestMiddleware {
       : null;
     if (!encryptedToken)
       throw new HttpException(
-        { status: HttpStatus.FORBIDDEN, error: 'You not permission to route this link!' },
-        HttpStatus.FORBIDDEN,
+        { status: HttpStatus.UNAUTHORIZED, error: 'You mush login to make the request' },
+        HttpStatus.UNAUTHORIZED,
       );
     let payload = await this.jwtService.verify(encryptedToken);
     req.role = payload.role;

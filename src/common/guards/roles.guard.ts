@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { UserRole } from '../../auth/enums/user-role.enum';
+import { UserRole } from './enums/user-role.enum';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -28,6 +28,6 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    throw new HttpException('You do not have permission (Roles)', HttpStatus.UNAUTHORIZED);
+    throw new HttpException('You do not have permission to access this page', HttpStatus.UNAUTHORIZED);
   }
 }

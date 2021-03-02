@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  UseGuards,
   Logger,
   Param,
   ValidationPipe,
@@ -15,9 +14,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { AuthGuard } from '@nestjs/passport';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../auth/enums/user-role.enum';
+import { Roles } from '../common/guards/decorators/roles.decorator';
+import { UserRole } from '../common/guards/enums/user-role.enum';
 import { User } from '../users/schemas/user.schema';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';

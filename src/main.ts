@@ -16,6 +16,6 @@ async function bootstrap() {
     signatureVersion: 'v4',
   });
   await app.listen(3006);
-  logger.log(`Application listening on port 3000`);
+  logger.log(`Application listening on port 3006`);
 }
 bootstrap();
